@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,12 +20,6 @@
 
 body {
   color: "#000000",
-  /* background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb)); */
 }
 
 @layer utilities {
@@ -32,3 +27,4 @@ body {
     text-wrap: balance;
   }
 }
+

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/image"; //optimized image
 import { useProductContext } from "../../../../context/ProductContext";
 
 const CouponGift = () => {

@@ -1,27 +1,34 @@
 "use client";
 import { Product } from "@/views/guestViews/productListing";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 import { toast } from "react-toastify";
 import { COUPON_NAME } from "../constants/couponConstants";
 
 export interface ProductContextProps {
   handleAddToCart: (productDetails: Product) => void;
   handleAddProduct: (product: ProductDetail) => void;
-  prodDetails: ProductDetail[];
-  openCoupon: boolean;
   handleDecreaseProduct: (product: ProductDetail) => void;
   handleDeleteProduct: (productId: string) => void;
   handleCoupon: () => void;
   handleCouponClose: () => void;
+  handleApplyCoupon: (coupon: string) => void;
+  handleChangeCoupon: (value: string) => void;
+  handleRemoveWarning: (productId: string) => void;
+  handleRemoveWarningClose: () => void;
+  prodDetails: ProductDetail[];
+  openCoupon: boolean;
   isCouponAdded: boolean;
   addedProductIds: string[];
   openWarningDeleteId: string;
   couponText: string;
-  handleRemoveWarning: (productId: string) => void;
-  handleRemoveWarningClose: () => void;
-  handleApplyCoupon: (coupon: string) => void;
-  handleChangeCoupon: (value: string) => void;
   isCouponApplied: boolean;
+  couponErr: string;
 }
 
 export interface ProductDetail extends Product {
@@ -30,24 +37,25 @@ export interface ProductDetail extends Product {
   totalDiscount: number;
 }
 
-const ProuctContext = createContext<ProductContextProps>({
+const ProductContext = createContext<ProductContextProps>({
   handleAddToCart: () => {},
   handleAddProduct: () => {},
   handleDecreaseProduct: () => {},
   handleDeleteProduct: () => {},
+  handleCoupon: () => {},
+  handleCouponClose: () => {},
+  handleApplyCoupon: () => {},
+  handleChangeCoupon: () => {},
+  handleRemoveWarning: () => {},
+  handleRemoveWarningClose: () => {},
   prodDetails: [],
   openCoupon: false,
   isCouponAdded: false,
   addedProductIds: [],
   openWarningDeleteId: "",
   couponText: "",
-  handleCoupon: () => {},
-  handleCouponClose: () => {},
-  handleRemoveWarning: () => {},
-  handleRemoveWarningClose: () => {},
-  handleApplyCoupon: () => {},
-  handleChangeCoupon: () => {},
   isCouponApplied: false,
+  couponErr: "",
 });
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
@@ -58,13 +66,16 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [openWarningDeleteId, setOpenWarningDeleteId] = useState("");
   const [couponText, setCouponText] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
+  const [couponErr, setCouponErr] = useState("");
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = useCallback((product: Product) => {
     toast("Product added to cart!");
     setProdDetails((prevCart) => {
       const existingProduct = prevCart.find((item) => item._id === product._id);
+
       if (existingProduct) {
-        return prevCart?.map((item) =>
+        // Update existing product in cart
+        return prevCart.map((item) =>
           item._id === product._id
             ? {
                 ...item,
@@ -75,6 +86,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
             : item
         );
       } else {
+        // Add new product to cart
         return [
           ...prevCart,
           {
@@ -86,124 +98,144 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         ];
       }
     });
+
+    // Added products array to check conditon for add to cart and added
     setAddedProductIds((prevIds) => [...prevIds, String(product._id)]);
-  };
+  }, []);
 
-  const handleAddProduct = (product: ProductDetail) => {
+  const handleAddProduct = useCallback((product: ProductDetail) => {
     setProdDetails((prevCart) => {
       const existingProduct = prevCart.find((item) => item._id === product._id);
+
+      return existingProduct
+        ? // Update quantity and price of existing product
+          prevCart.map((item) =>
+            item._id === product._id
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                  totalPrice: (item.quantity + 1) * product.price,
+                  totalDiscount: (item.quantity + 1) * product.originalPrice,
+                }
+              : item
+          )
+        : // Add new product to cart with updating 1 quantity
+          [
+            ...prevCart,
+            {
+              ...product,
+              quantity: 1,
+              totalPrice: product.price,
+              totalDiscount: product.originalPrice - product.price,
+            },
+          ];
+    });
+  }, []);
+
+  const handleDecreaseProduct = useCallback((product: ProductDetail) => {
+    setProdDetails((prevCart) => {
+      const existingProduct = prevCart.find((item) => item._id === product._id);
+
       if (existingProduct) {
-        return prevCart?.map((item) =>
-          item._id === product._id
-            ? {
-                ...item,
-                quantity: item.quantity + 1,
-                totalPrice: (item.quantity + 1) * product.price,
-                totalDiscount: (item.quantity + 1) * product.originalPrice,
-              }
-            : item
-        );
-      } else {
-        return [
-          ...prevCart,
-          {
-            ...product,
-            quantity: 1,
-            totalPrice: product.price,
-            totalDiscount: product.originalPrice - product.price,
-          },
-        ];
+        if (existingProduct.quantity > 1) {
+          // Decrease quantity and update price and discount if more than one
+          return prevCart.map((item) =>
+            item._id === product._id
+              ? {
+                  ...item,
+                  quantity: item.quantity - 1,
+                  totalPrice: (item.quantity - 1) * product.price,
+                  totalDiscount: (item.quantity - 1) * product.originalPrice,
+                }
+              : item
+          );
+        } else {
+          // Remove product if quantity is one
+          return prevCart.filter((item) => item._id !== product._id);
+        }
       }
-    });
-  };
 
-  const handleDecreaseProduct = (product: ProductDetail) => {
-    setProdDetails((prevCart) => {
-      const existingProduct = prevCart.find((item) => item._id === product._id);
-      if (existingProduct && existingProduct.quantity > 1) {
-        return prevCart?.map((item) =>
-          item._id === product._id
-            ? {
-                ...item,
-                quantity: item.quantity - 1,
-                totalPrice: (item.quantity - 1) * product.price,
-                totalDiscount: (item.quantity - 1) * product.originalPrice,
-              }
-            : item
-        );
-      } else if (existingProduct && existingProduct.quantity === 1) {
-        return prevCart.filter((item) => item._id !== product._id);
-      } else {
-        return prevCart;
-      }
+      // Return previous cart value if product not found
+      return prevCart;
     });
-  };
+  }, []);
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = useCallback((productId: string) => {
+    // Remove product
     setProdDetails((prevCart) =>
       prevCart.filter((item) => item._id !== productId)
     );
-    setOpenWarningDeleteId("");
-  };
+    //Changing added text to add to cart again by updating state
+    setAddedProductIds((prevCart) =>
+      prevCart.filter((item) => item !== productId)
+    );
+    setOpenWarningDeleteId(""); // Close warning modal
+  }, []);
 
-  const handleRemoveWarning = (productId: string) => {
+  const handleRemoveWarning = useCallback((productId: string) => {
     setOpenWarningDeleteId(productId);
-  };
+  }, []);
 
-  const handleRemoveWarningClose = () => {
+  const handleRemoveWarningClose = useCallback(() => {
     setOpenWarningDeleteId("");
-  };
+  }, []);
 
-  const handleCoupon = () => {
+  const handleCoupon = useCallback(() => {
     setOpenCoupon(true);
     setIsCouponAdded(true);
-  };
+  }, []);
 
-  const handleCouponClose = () => {
+  const handleCouponClose = useCallback(() => {
     setOpenCoupon(false);
-  };
+  }, []);
 
-  const handleApplyCoupon = (coupon: string) => {
+  const handleApplyCoupon = useCallback((coupon: string) => {
     if (coupon === COUPON_NAME) {
+      // Coupon is valid
       setIsCouponApplied(true);
       toast.success("Coupon Applied!");
     } else {
-      toast.error("Invalid coupon");
+      // Coupon is invalid or empty
+      setCouponErr(coupon ? "" : "Please enter coupon value");
+      if (coupon && coupon !== COUPON_NAME) {
+        toast.error("Invalid coupon");
+      }
     }
-  };
+  }, []);
 
-  const handleChangeCoupon = (value: string) => {
+  const handleChangeCoupon = useCallback((value: string) => {
     setCouponText(value);
-  };
+  }, []);
 
   return (
-    <ProuctContext.Provider
+    <ProductContext.Provider
       value={{
         handleAddToCart,
-        prodDetails,
-        openCoupon,
-        isCouponAdded,
-        addedProductIds,
-        couponText,
-        openWarningDeleteId,
         handleAddProduct,
         handleDecreaseProduct,
         handleDeleteProduct,
         handleCoupon,
         handleCouponClose,
-        handleRemoveWarning,
-        handleRemoveWarningClose,
         handleApplyCoupon,
         handleChangeCoupon,
+        handleRemoveWarning,
+        handleRemoveWarningClose,
+        prodDetails,
+        openCoupon,
+        isCouponAdded,
+        addedProductIds,
+        openWarningDeleteId,
+        couponText,
         isCouponApplied,
+        couponErr,
       }}
     >
       {children}
-    </ProuctContext.Provider>
+    </ProductContext.Provider>
   );
 };
 
 export const useProductContext = (): ProductContextProps => {
-  const context = useContext(ProuctContext);
+  const context = useContext(ProductContext);
   return context;
 };

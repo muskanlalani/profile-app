@@ -1,5 +1,6 @@
-import Header from "../guestLayout/header";
-import ProductListing from "../productListing";
+import dynamic from "next/dynamic";
+const Header = dynamic(() => import("../guestLayout/header"));
+const ProductListing = dynamic(() => import("../productListing"));
 
 const HomePage = () => {
   return (

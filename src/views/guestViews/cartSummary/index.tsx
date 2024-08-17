@@ -1,9 +1,10 @@
-import Image from "next/image";
+import Image from "next/image"; //optimized image
 import { useProductContext } from "../../../../context/ProductContext";
 import UIStyledButton from "@/components/UIComponents/UIStyledButton";
 import { useRouter } from "next/navigation";
 import ApplyCoupon from "../applyCoupon";
 import WrapperContainer from "@/components/UIComponents/WrapperContainer";
+import ButtonText from "@/components/common/ButtonText";
 
 const CartSummary = () => {
   const { prodDetails, isCouponApplied } = useProductContext();
@@ -81,9 +82,7 @@ const CartSummary = () => {
               </div>
             </div>
             <UIStyledButton handleClick={handleCheckoutRedirect}>
-              <p className="block  font-sans text-sm antialiased font-semibold leading-snug tracking-normal text-blue-gray-900 truncate max-w-xs">
-                Checkout
-              </p>
+              <ButtonText>Checkout</ButtonText>
             </UIStyledButton>
           </div>
         </div>
@@ -99,9 +98,7 @@ const CartSummary = () => {
             Your cart is empty
           </h4>
           <UIStyledButton handleClick={handleShoppingRedirect}>
-            <p className="block  font-sans text-sm antialiased font-semibold leading-snug tracking-normal text-blue-gray-900 truncate max-w-xs">
-              Continue shopping
-            </p>
+            <ButtonText> Continue shopping</ButtonText>
           </UIStyledButton>
         </div>
       )}

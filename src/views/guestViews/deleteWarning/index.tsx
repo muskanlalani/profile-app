@@ -1,6 +1,6 @@
 import UIStyledButton from "@/components/UIComponents/UIStyledButton";
 import UIStyledDialog from "@/components/UIComponents/UIStyledDialog";
-import Image from "next/image";
+import Image from "next/image"; //optimized image
 import { useProductContext } from "../../../../context/ProductContext";
 
 const DeleteWarning = () => {
