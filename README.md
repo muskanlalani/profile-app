@@ -3,7 +3,7 @@
 A modern web application designed for managing and shopping for profile-related items. Built with Next.js, TypeScript, and Tailwind CSS
 
 ## Tech stack used
-- Next.js, React.js, TypeScript, JavaScript, Tailwind CSS, Mongoose, 
+- Next.js, React.js, TypeScript, JavaScript, Tailwind CSS, Mongoose.
 
 ## Features
 
