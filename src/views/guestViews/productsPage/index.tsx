@@ -3,8 +3,8 @@ import { useProductContext } from "../../../../context/ProductContext";
 import CartSummary from "../cartSummary";
 import WrapperContainer from "@/components/UIComponents/WrapperContainer";
 import DeleteWarning from "../deleteWarning";
-import ProductHeader from "./productHeader";
 import ProductCard from "./ProductCard";
+import ProductHeader from "./ProductHeader";
 
 const Products = () => {
   const { openWarningDeleteId } = useProductContext();
