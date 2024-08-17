@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Bucket -->
+  <rect x="60" y="60" width="80" height="80" rx="10" ry="10" fill="white" stroke="black" stroke-width="3"/>
+  
+  <!-- Frown face -->
+  <circle cx="100" cy="120" r="2" fill="black"/>
+  <circle cx="120" cy="120" r="2" fill="black"/>
+  <path d="M105 130 Q110 135 115 130" stroke="black" stroke-width="2" fill="transparent"/>
+
+  <!-- Red sticks -->
+  <rect x="80" y="50" width="50" height="10" fill="red" transform="rotate(30 80 50)"/>
+  <rect x="95" y="40" width="50" height="10" fill="red" transform="rotate(45 95 40)"/>
+
+  <!-- Stars and bubbles -->
+  <circle cx="30" cy="50" r="8" fill="#00A3E8"/>
+  <circle cx="170" cy="40" r="5" fill="#00A3E8"/>
+  <circle cx="140" cy="150" r="3" fill="#00A3E8"/>
+  <circle cx="40" cy="140" r="4" fill="#00A3E8"/>
+
+  <polygon points="25,25 30,35 35,25 30,20" fill="#FFD700"/>
+  <polygon points="150,20 155,30 160,20 155,15" fill="#FFD700"/>
+  <polygon points="130,160 135,170 140,160 135,155" fill="#FFD700"/>
+</svg>
